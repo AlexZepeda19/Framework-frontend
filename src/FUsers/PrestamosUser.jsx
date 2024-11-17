@@ -51,7 +51,7 @@ const PrestamosUser = () => {
         <Col md={6}>
           <Card>
             <Card.Body>
-              <h2 className="text-center mb-4">Agregar Nuevo Préstamo</h2>
+              <h2 className="text-center mb-4">DETALLES DE SU PRESTAMO</h2>
               <Form onSubmit={handleSubmit}>
                 <Form.Group controlId="formIdUsuario">
                   <Form.Label>ID Usuario</Form.Label>

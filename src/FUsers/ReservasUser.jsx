@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import axios from 'axios';
+import { Button, Form, Container, Row, Col, Card } from 'react-bootstrap';
 
 const ReservaUser = () => {
   const location = useLocation();
@@ -11,7 +12,7 @@ const ReservaUser = () => {
 
   useEffect(() => {
     if (location.state?.libroId) {
-      setIdLibro(location.state.libroId);  // Establece idLibro con el valor pasado en el state
+      setIdLibro(location.state.libroId);
     }
 
     // Establecer la fecha actual por defecto
@@ -20,11 +21,9 @@ const ReservaUser = () => {
     setFechaReserva(fechaActualISO);
   }, [location.state]);
 
-  // Maneja el envío del formulario
   const handleSubmit = async (event) => {
     event.preventDefault();
 
-    // Crea el objeto de la reserva
     const reserva = {
       usuario: { id_usuario: idUsuario },
       libro: { id_libro: idLibro },
@@ -35,7 +34,6 @@ const ReservaUser = () => {
     console.log('Datos enviados:', reserva);
 
     try {
-      // Realiza la solicitud POST para agregar la reserva
       const response = await axios.post('http://localhost:8080/api/reservas', reserva);
       if (response.status === 201) {
         alert('Reserva creada exitosamente');
@@ -50,60 +48,67 @@ const ReservaUser = () => {
   };
 
   return (
-    <div className="container mt-5">
-      <h1>Agregar Reserva</h1>
-      <form onSubmit={handleSubmit}>
-        <div className="form-group">
-          <label htmlFor="idUsuario">ID de Usuario:</label>
-          <input
-            type="number"
-            className="form-control"
-            id="idUsuario"
-            value={idUsuario}
-            onChange={(e) => setIdUsuario(e.target.value)}
-            required
-          />
-        </div>
+    <Container className="mt-5">
+      <Row className="justify-content-center">
+        <Col md={6}>
+          <Card>
+            <Card.Body>
+              <h2 className="text-center mb-4">DETALLES DE SU RESERVA</h2>
+              <Form onSubmit={handleSubmit}>
+                <Form.Group controlId="formIdUsuario">
+                  <Form.Label>ID de Usuario</Form.Label>
+                  <Form.Control
+                    type="number"
+                    placeholder="Ingrese ID del Usuario"
+                    value={idUsuario}
+                    onChange={(e) => setIdUsuario(e.target.value)}
+                    required
+                  />
+                </Form.Group>
 
-        <div className="form-group">
-          <label htmlFor="idLibro">ID de Libro:</label>
-          <input
-            type="number"
-            className="form-control"
-            id="idLibro"
-            value={idLibro}
-            onChange={(e) => setIdLibro(e.target.value)}
-            disabled  // Deshabilitamos el campo ya que el idLibro viene del estado
-          />
-        </div>
+                <Form.Group controlId="formIdLibro">
+                  <Form.Label>ID de Libro</Form.Label>
+                  <Form.Control
+                    type="number"
+                    placeholder="ID del Libro"
+                    value={idLibro}
+                    onChange={(e) => setIdLibro(e.target.value)}
+                    disabled
+                  />
+                </Form.Group>
 
-        <div className="form-group">
-          <label htmlFor="fechaReserva">Fecha de Reserva:</label>
-          <input
-            type="datetime-local"
-            className="form-control"
-            id="fechaReserva"
-            value={fechaReserva}
-            onChange={(e) => setFechaReserva(e.target.value)}
-            required
-          />
-        </div>
+                <Form.Group controlId="formFechaReserva">
+                  <Form.Label>Fecha de Reserva</Form.Label>
+                  <Form.Control
+                    type="datetime-local"
+                    value={fechaReserva}
+                    onChange={(e) => setFechaReserva(e.target.value)}
+                    required
+                  />
+                </Form.Group>
 
-        <div className="form-group">
-          <label htmlFor="idEstado">ID de Estado:</label>
-          <input
-            type="number"
-            className="form-control"
-            id="idEstado"
-            value={idEstado}
-            onChange={(e) => setIdEstado(e.target.value)}
-            required
-          />
-        </div>
+                <Form.Group controlId="formIdEstado">
+                  <Form.Label>ID de Estado</Form.Label>
+                  <Form.Control
+                    type="number"
+                    placeholder="ID de Estado"
+                    value={idEstado}
+                    onChange={(e) => setIdEstado(e.target.value)}
+                    required
+                  />
+                </Form.Group>
 
-        <button type="submit" className="btn btn-primary mt-3">Agregar Reserva</button>
-      </form>
-    </div>
+                <div className="text-center">
+                  <Button variant="primary" type="submit" className="mt-3">
+                    Agregar Reserva
+                  </Button>
+                </div>
+              </Form>
+            </Card.Body>
+          </Card>
+        </Col>
+      </Row>
+    </Container>
   );
 };
 
