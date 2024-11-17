@@ -15,13 +15,26 @@ const MenuUser = () => {
                             <a className="nav-link" href="/Home">Inicio</a>
                         </li>
                         <li className="nav-item">
-                            <a className="nav-link" href="/ShowUser/LibrosUser">Administrar Libros</a>
+                            <a className="nav-link" href="/ShowUser/LibrosUser">Ver Biblioteca</a>
+                        </li>
+                        <li className="nav-item">
+                            <a className="nav-link" href="/ShowUser/CategoriasUser">Ver Categorias</a>
+                        </li>
+                        <li className="nav-item dropdown">
+                            <a className="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                Ver más
+                            </a>
+                            <div className="dropdown-menu" aria-labelledby="navbarDropdown">
+                                <a className="dropdown-item" href="/ShowUser/PrestamosUser">Revisar mis préstamos</a>
+                                <a className="dropdown-item" href="/ShowUser/ReservasUser">Revisar mis reservas</a>
+                            </div>
                         </li>
                         <li className="nav-item">
                             <a className="nav-link" href="/Logout">Cerrar Sesión</a>
                         </li>
                     </ul>
                 </div>
+
             </nav>
 
             {/* Jumbotron */}

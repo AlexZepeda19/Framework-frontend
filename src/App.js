@@ -16,9 +16,14 @@ import Reservas from './Show/Reservas';
 import ReservasUser from './FUsers/ReservasUser';
 
 import Usuarios from './Show/Usuarios';
+
+
 import Categorias from './Show/Categorias';
+import CategoriasUser from './ShowUser/CategoriasUser';
 
 import 'bootstrap/dist/css/bootstrap.min.css';
+import 'bootstrap/dist/js/bootstrap.bundle.min';
+
 
 function App() {
   return (
@@ -40,6 +45,10 @@ function App() {
 
         {/* Rutas para componentes ShowUser */}
         <Route path="/ShowUser/LibrosUser" element={<LibrosUser />} />
+        <Route path="/ShowUser/CategoriasUser" element={<CategoriasUser />} />
+
+
+        {/* Rutas para componentes FUsers */}
         <Route path="/FUsers/PrestamosUser" element={<PrestamosUser />} />
         <Route path="/FUsers/ReservasUser" element={<ReservasUser />} />
 
