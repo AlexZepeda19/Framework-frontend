@@ -1,6 +1,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import './App.css';
+
 import Login from './components/Login';
 
 import MenuAdmin from './pages/MenuAdmin';
@@ -45,6 +46,7 @@ function App() {
         {/* Rutas para Libros, Prestamos, Usuarios y Categorias */}
         <Route path="/ShowUser/LibrosUser" element={<LibrosUser />} />
         <Route path="/ShowUser/PrestamosUser" element={<PrestamosUser />} />
+
 
 
         {/* Rutas para Libros, Prestamos, Usuarios y Categorias */}

@@ -40,12 +40,12 @@ const LibrosUser = () => {
   // Funciones para manejar la navegación
   const handlePrestar = (id) => {
     // Navegar a la página de préstamo con el id del libro
-    navigate(`/prestar/${id}`);
+    navigate(`/PrestamoUser/${id}`);
   };
 
   const handleReservar = (id) => {
     // Navegar a la página de reserva con el id del libro
-    navigate(`/reservar/${id}`);
+    navigate(`/ReservasUser/${id}`);
   };
 
   return (
