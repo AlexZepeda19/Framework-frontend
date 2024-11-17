@@ -17,6 +17,16 @@ const PrestamosUser = () => {
     if (location.state?.libroId) {
       setIdLibro(location.state.libroId);  // Establecer el ID del libro si se pasó en el estado
     }
+
+    // Establecer la fecha de préstamo a la fecha actual y la fecha de devolución a 8 días después
+    const fechaActual = new Date();
+    const fechaActualISO = fechaActual.toISOString().slice(0, 16);
+    const fechaDevolucion = new Date(fechaActual);
+    fechaDevolucion.setDate(fechaDevolucion.getDate() + 8);
+    const fechaDevolucionISO = fechaDevolucion.toISOString().slice(0, 16);
+
+    setFechaPrestamo(fechaActualISO);
+    setFechaDevolucion(fechaDevolucionISO);
   }, [location.state]);
 
   const handleSubmit = async (event) => {

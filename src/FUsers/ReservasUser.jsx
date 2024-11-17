@@ -1,19 +1,23 @@
 import React, { useState, useEffect } from 'react';
-import { useLocation } from 'react-router-dom';  // Importamos useLocation
+import { useLocation } from 'react-router-dom';  
 import axios from 'axios';
 
 const ReservaUser = () => {
-    const location = useLocation(); // Accedemos a la ubicación
+    const location = useLocation(); 
     const [idUsuario, setIdUsuario] = useState('');
-    const [idLibro, setIdLibro] = useState(location.state?.libroId || ''); // Recuperamos el idLibro desde el state
+    const [idLibro, setIdLibro] = useState(location.state?.libroId || ''); 
     const [fechaReserva, setFechaReserva] = useState('');
     const [idEstado, setIdEstado] = useState('');
 
-    // Verifica que se haya recuperado correctamente el idLibro
     useEffect(() => {
         if (location.state?.libroId) {
             setIdLibro(location.state.libroId);  // Establece idLibro con el valor pasado en el state
         }
+
+        // Establecer la fecha actual por defecto
+        const fechaActual = new Date();
+        const fechaActualISO = fechaActual.toISOString().slice(0, 16);
+        setFechaReserva(fechaActualISO);
     }, [location.state]);
 
     // Maneja el envío del formulario
@@ -30,7 +34,7 @@ const ReservaUser = () => {
 
         try {
             // Realiza la solicitud POST para agregar la reserva
-            const response = await axios.post('http://tudominio.com/api/reservas', reserva);
+            const response = await axios.post('http://localhost:8080/api/v1/reservas', reserva); // Asegúrate de usar la URL correcta
             if (response.status === 201) {
                 alert('Reserva creada exitosamente');
             }
