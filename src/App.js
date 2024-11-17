@@ -9,7 +9,7 @@ function App() {
     <Routes>
       <Route path="/" element={<Login />} /> {/* Cargar Login al inicio */}
       <Route path="/components/login" element={<Login />} />
-      <Route path="/components/MenuAdmin" element={<MenuAdmin />} />
+      <Route path="/pages/MenuAdmin" element={<MenuAdmin />} />
     </Routes>
   </Router>
   );

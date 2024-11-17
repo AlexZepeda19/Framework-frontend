@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom'; // Importar useNavigate
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const navigate = useNavigate(); // Hook para navegación
+  const navigate = useNavigate(); 
 
   const handleSubmit = (event) => {
     event.preventDefault();
@@ -32,7 +32,7 @@ const Login = () => {
         if (data.token) {
           localStorage.setItem('token', data.token); 
           alert('Inicio de sesión exitoso');
-          navigate('/menuAdmin'); // Redirigir después de inicio de sesión exitoso
+          navigate('/pages/MenuAdmin'); 
         }
       })
       .catch((error) => {
