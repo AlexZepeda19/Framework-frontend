@@ -29,6 +29,13 @@ function App() {
         <Route path="/Show/Categorias" element={<Categorias />} />
         <Route path="/Show/Reservas" element={<Reservas />} />
 
+        {/* Rutas para Libros, Prestamos, Usuarios y Categorias */}
+        <Route path="/Add/Libros" element={<Libros />} />
+        <Route path="/Add/Prestamos" element={<Prestamos />} />
+        <Route path="/Add/Usuarios" element={<Usuarios />} />
+        <Route path="/Add/Categorias" element={<Categorias />} />
+        <Route path="/Add/Reservas" element={<Reservas />} />
+
 
       </Routes>
     </Router>

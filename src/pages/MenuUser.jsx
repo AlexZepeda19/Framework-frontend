@@ -15,9 +15,6 @@ const MenuUser = () => {
                             <a className="nav-link" href="/Home">Inicio</a>
                         </li>
                         <li className="nav-item">
-                            <a className="nav-link" href="/Categorias">Categorías</a>
-                        </li>
-                        <li className="nav-item">
                             <a className="nav-link" href="/Usuarios">Prestamos</a>
                         </li>
                         <li className="nav-item">
