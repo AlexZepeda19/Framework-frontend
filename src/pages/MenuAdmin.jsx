@@ -7,9 +7,11 @@ const MenuAdmin = () => {
             <button className="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span className="navbar-toggler-icon"></span> </button> <div className="collapse navbar-collapse" id="navbarNav">
                 <ul className="navbar-nav"> <li className="nav-item"> <a className="nav-link" href="/Home">Inicio</a> </li>
-                    <li className="nav-item"> <a className="nav-link" href="/Categorias">Administrar Categorías</a> </li>
-                    <li className="nav-item"> <a className="nav-link" href="/Usuarios">Administrar Usuarios</a> </li>
-                    <li className="nav-item"> <a className="nav-link" href="/Roles">Administrar Roles</a> </li>
+                    <li className="nav-item"> <a className="nav-link" href="/Show/Categorias">Administrar Categorías</a> </li>
+                    <li className="nav-item"> <a className="nav-link" href="/Show/Libros">Administrar Libros</a> </li>
+                    <li className="nav-item"> <a className="nav-link" href="/Show/Prestamos">Administrar Prestamos</a> </li>
+                    <li className="nav-item"> <a className="nav-link" href="/Show/Reservas">Administrar Reservas</a> </li>
+                    <li className="nav-item"> <a className="nav-link" href="/Show/Usuarios">Administrar Usuarios</a> </li>
                     <li className="nav-item"> <a className="nav-link" href="/Logout">Cerrar Sesión</a> </li>
                 </ul>
             </div>
