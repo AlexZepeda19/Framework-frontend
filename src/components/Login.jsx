@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import './Login.css'
+
 
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const navigate = useNavigate(); 
+  const navigate = useNavigate();
 
   const handleSubmit = (event) => {
     event.preventDefault();
@@ -31,9 +31,9 @@ const Login = () => {
       .then(data => {
         console.log('Success:', data);
         if (data.token) {
-          localStorage.setItem('token', data.token); 
+          localStorage.setItem('token', data.token);
           alert('Inicio de sesión exitoso');
-          navigate('/pages/MenuAdmin'); 
+          navigate('/pages/MenuAdmin');
         }
       })
       .catch((error) => {
@@ -43,29 +43,19 @@ const Login = () => {
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <label htmlFor="email">Email:</label>
-      <input
-        type="email"
-        id="email"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-        required
-      />
-      <br />
-
-      <label htmlFor="password">Contraseña:</label>
-      <input
-        type="password"
-        id="password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-        required
-      />
-      <br />
-
-      <button type="submit">Iniciar Sesión</button>
-    </form>
+    <div className="container mt-5">
+      <form onSubmit={handleSubmit} className="border p-4 shadow-sm rounded">
+        <div className="form-group">
+          <label htmlFor="email">Email:</label>
+          <input type="email" id="email" value={email} onChange={(e) => setEmail(e.target.value)} required className="form-control" />
+        </div>
+        <div className="form-group">
+          <label htmlFor="password">Contraseña:</label>
+          <input type="password" id="password" value={password} onChange={(e) => setPassword(e.target.value)} required className="form-control" />
+        </div>
+        <button type="submit" className="btn btn-primary">Iniciar Sesión</button>
+      </form>
+    </div>
   );
 };
 
