@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import 'bootstrap/dist/js/bootstrap.bundle.min'; 
+import 'bootstrap/dist/js/bootstrap.bundle.min';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -34,15 +34,17 @@ const Login = () => {
 
       // Verifica si hay un token en la respuesta
       if (data.token) {
-        localStorage.setItem('token', data.token); 
+        // Guarda tanto el token como el idUser en localStorage
+        localStorage.setItem('token', data.token);
+        localStorage.setItem('idUser', data.idUser); 
         alert('Inicio de sesión exitoso');
 
-        // Verifica que roleId esté presente
+        // Verifica el roleId y navega según el rol
         if (data.roleId === 1) { 
           navigate('/pages/MenuAdmin');
         } 
         else if (data.roleId === 2) { 
-          navigate('/pages/MenuUser'); 
+          navigate('/pages/MenuUser');
         } else { 
           console.warn('Rol no reconocido');
         }

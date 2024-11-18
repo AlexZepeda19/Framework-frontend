@@ -1,19 +1,25 @@
 import React, { useState, useEffect } from 'react';
-import { useLocation } from 'react-router-dom'; // Importamos useLocation
+import { useLocation, useNavigate } from 'react-router-dom'; // Importamos useNavigate
 import axios from 'axios';
-import { Button, Form, Container, Row, Col, Card } from 'react-bootstrap'; // Importamos los componentes de Bootstrap
+import { Button, Form, Container, Row, Col, Card } from 'react-bootstrap';
 
 const PrestamosUser = () => {
-  const location = useLocation(); // Usamos useLocation para acceder a la ubicación y el state
+  const location = useLocation(); // Usamos useLocation para acceder a la ubicación y el estado
+  const navigate = useNavigate(); // Inicializamos el hook de navegación
 
-  // Recuperamos el libroId del estado pasado
   const [idUsuario, setIdUsuario] = useState('');  // Inicializamos con un valor vacío
   const [idLibro, setIdLibro] = useState(location.state?.libroId || '');  // Recuperamos el libroId del state (si existe)
   const [fechaPrestamo, setFechaPrestamo] = useState('');
   const [fechaDevolucion, setFechaDevolucion] = useState('');
 
-  // Asegurarse de que el libroId se recupere del state al cargar el formulario
+  // Recuperar el idUsuario desde localStorage
   useEffect(() => {
+    const storedIdUsuario = localStorage.getItem('idUser');
+    if (storedIdUsuario) {
+      setIdUsuario(storedIdUsuario);
+    }
+
+    // Asegurarse de que el libroId se recupere del state al cargar el formulario
     if (location.state?.libroId) {
       setIdLibro(location.state.libroId);  // Establecer el ID del libro si se pasó en el estado
     }
@@ -31,17 +37,26 @@ const PrestamosUser = () => {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+
     const prestamo = {
       usuario: { id_usuario: idUsuario },
       libro: { id_libro: idLibro },
       fechaPrestamo: fechaPrestamo,
       fechaDevolucion: fechaDevolucion,
     };
+
     try {
       const response = await axios.post('http://localhost:8080/api/v1/prestamos', prestamo);
-      console.log('Préstamo agregado:', response.data);
+      if (response.status === 201) {
+        alert('Préstamo agregado exitosamente');
+        navigate(-1); // Regresar a la página anterior (simula un "Volver atrás")
+      } else {
+        console.error('Error al agregar el préstamo:', response);
+        alert('Hubo un error al agregar el préstamo');
+      }
     } catch (error) {
       console.error('Error al agregar el préstamo:', error);
+      alert('Hubo un error al agregar el préstamo');
     }
   };
 
@@ -56,11 +71,10 @@ const PrestamosUser = () => {
                 <Form.Group controlId="formIdUsuario">
                   <Form.Label>ID Usuario</Form.Label>
                   <Form.Control
-                    type="number"
-                    placeholder="Ingrese ID del Usuario"
+                    type="text"
+                    placeholder="ID del Usuario"
                     value={idUsuario}
-                    onChange={(e) => setIdUsuario(e.target.value)}
-                    required
+                    readOnly  // Hacemos el campo solo lectura para que no se pueda modificar
                   />
                 </Form.Group>
 
@@ -70,7 +84,6 @@ const PrestamosUser = () => {
                     type="number"
                     placeholder="ID del Libro"
                     value={idLibro}
-                    onChange={(e) => setIdLibro(e.target.value)}
                     disabled  // Desactivamos el campo ya que el ID del libro se pasa desde el estado
                   />
                 </Form.Group>
@@ -80,8 +93,7 @@ const PrestamosUser = () => {
                   <Form.Control
                     type="datetime-local"
                     value={fechaPrestamo}
-                    onChange={(e) => setFechaPrestamo(e.target.value)}
-                    required
+                    readOnly  // Hacemos el campo solo lectura para que no se pueda modificar
                   />
                 </Form.Group>
 
@@ -90,8 +102,7 @@ const PrestamosUser = () => {
                   <Form.Control
                     type="datetime-local"
                     value={fechaDevolucion}
-                    onChange={(e) => setFechaDevolucion(e.target.value)}
-                    required
+                    readOnly  // Hacemos el campo solo lectura para que no se pueda modificar
                   />
                 </Form.Group>
 

@@ -1,25 +1,29 @@
 import React, { useState, useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom'; // Usamos useLocation y useNavigate
 import axios from 'axios';
 import { Button, Form, Container, Row, Col, Card } from 'react-bootstrap';
 
-const ReservaUser = () => {
+const ReservasUser = () => {
   const location = useLocation();
-  const [idUsuario, setIdUsuario] = useState('');
-  const [idLibro, setIdLibro] = useState(location.state?.libroId || '');
+  const navigate = useNavigate(); // Inicializamos el hook de navegación
+
+  const [idUsuario, setIdUsuario] = useState(''); // Inicializamos el estado del idUsuario
+  const [idLibro, setIdLibro] = useState(location.state?.libroId || ''); // Recuperamos el libroId del state si existe
   const [fechaReserva, setFechaReserva] = useState('');
-  const [idEstado, setIdEstado] = useState('');
+  const [idEstado, setIdEstado] = useState(2); // Establecemos el estado por defecto a 2
 
   useEffect(() => {
-    if (location.state?.libroId) {
-      setIdLibro(location.state.libroId);
+    // Recuperamos el idUsuario desde localStorage al cargar el componente
+    const storedIdUsuario = localStorage.getItem('idUser');
+    if (storedIdUsuario) {
+      setIdUsuario(storedIdUsuario); // Establecemos el idUsuario
     }
 
     // Establecer la fecha actual por defecto
     const fechaActual = new Date();
-    const fechaActualISO = fechaActual.toISOString().slice(0, 16);
-    setFechaReserva(fechaActualISO);
-  }, [location.state]);
+    const fechaActualISO = fechaActual.toISOString().slice(0, 16); // Formateamos la fecha al formato ISO
+    setFechaReserva(fechaActualISO); // Establecemos la fecha de reserva
+  }, [location.state]); // Dependencia de location.state para que se recargue cuando cambie el libroId
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -28,7 +32,7 @@ const ReservaUser = () => {
       usuario: { id_usuario: idUsuario },
       libro: { id_libro: idLibro },
       fecha_reserva: fechaReserva,
-      estado: { id_estado: idEstado }
+      estado: { id_estado: idEstado },
     };
 
     console.log('Datos enviados:', reserva);
@@ -37,6 +41,7 @@ const ReservaUser = () => {
       const response = await axios.post('http://localhost:8080/api/reservas', reserva);
       if (response.status === 201) {
         alert('Reserva creada exitosamente');
+        navigate(-1); // Regresar a la página anterior (simula un "Volver atrás")
       } else {
         console.error('Error en la respuesta:', response);
         alert('Hubo un error al crear la reserva');
@@ -58,11 +63,9 @@ const ReservaUser = () => {
                 <Form.Group controlId="formIdUsuario">
                   <Form.Label>ID de Usuario</Form.Label>
                   <Form.Control
-                    type="number"
-                    placeholder="Ingrese ID del Usuario"
+                    type="text"
                     value={idUsuario}
-                    onChange={(e) => setIdUsuario(e.target.value)}
-                    required
+                    readOnly  // Campo solo lectura
                   />
                 </Form.Group>
 
@@ -70,10 +73,8 @@ const ReservaUser = () => {
                   <Form.Label>ID de Libro</Form.Label>
                   <Form.Control
                     type="number"
-                    placeholder="ID del Libro"
                     value={idLibro}
-                    onChange={(e) => setIdLibro(e.target.value)}
-                    disabled
+                    readOnly  // Campo solo lectura, ya que el idLibro se pasa desde location.state
                   />
                 </Form.Group>
 
@@ -84,6 +85,7 @@ const ReservaUser = () => {
                     value={fechaReserva}
                     onChange={(e) => setFechaReserva(e.target.value)}
                     required
+                    disabled  // Deshabilitar para que no pueda modificarse
                   />
                 </Form.Group>
 
@@ -91,10 +93,8 @@ const ReservaUser = () => {
                   <Form.Label>ID de Estado</Form.Label>
                   <Form.Control
                     type="number"
-                    placeholder="ID de Estado"
                     value={idEstado}
-                    onChange={(e) => setIdEstado(e.target.value)}
-                    required
+                    readOnly  // Campo solo lectura para que no pueda modificarse
                   />
                 </Form.Group>
 
@@ -112,4 +112,4 @@ const ReservaUser = () => {
   );
 };
 
-export default ReservaUser;
+export default ReservasUser;

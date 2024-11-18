@@ -1,6 +1,37 @@
 import React from 'react';
+import axios from 'axios'; // Importamos axios para hacer la solicitud HTTP
+import { useNavigate } from 'react-router-dom'; // Usamos useNavigate para redirigir después del logout
 
 const MenuUser = () => {
+    const navigate = useNavigate(); // Usamos useNavigate para la redirección
+
+    // Función para manejar el cierre de sesión
+    const handleLogout = async () => {
+        const token = localStorage.getItem('token'); // Suponiendo que el token está en localStorage
+
+        if (!token) {
+            console.error("No hay token disponible");
+            return;
+        }
+
+        try {
+            // Enviar el token al servidor para hacer logout
+            const response = await axios.post('http://localhost:8080/api/v1/auth/logout', {
+                token: token
+            });
+
+            console.log('Respuesta del logout:', response.data);
+
+            // Limpiar el almacenamiento local
+            localStorage.removeItem('token'); // Eliminar el token del localStorage
+            // Redirigir al usuario al inicio de sesión
+            navigate('/login'); // Redirige a la página de login
+        } catch (error) {
+            console.error('Error en el cierre de sesión:', error);
+            // Puedes mostrar un mensaje de error o manejarlo de otra manera
+        }
+    };
+
     return (
         <div className="container mt-5">
             {/* Navbar */}
@@ -30,11 +61,10 @@ const MenuUser = () => {
                             </div>
                         </li>
                         <li className="nav-item">
-                            <a className="nav-link" href="/Logout">Cerrar Sesión</a>
+                            <button className="btn btn-danger" onClick={handleLogout}>Cerrar Sesión</button>
                         </li>
                     </ul>
                 </div>
-
             </nav>
 
             {/* Jumbotron */}
