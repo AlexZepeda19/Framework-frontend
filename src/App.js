@@ -2,6 +2,7 @@ import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import './App.css';
 
+import Registro from './components/Registro'
 import Login from './components/Login';
 import MenuAdmin from './pages/MenuAdmin';
 import MenuUser from './pages/MenuUser';
@@ -52,6 +53,8 @@ function App() {
         <Route path="/ShowUser/CategoriasUser" element={<CategoriasUser />} />
         <Route path="/ShowUser/PrestamosUserList" element={<PrestamosUserList />} />
         <Route path="/ShowUser/ReservasUserList" element={<ReservasUserList />} />
+
+        <Route path="/components/Registro" element={<Registro />} />
 
 
 

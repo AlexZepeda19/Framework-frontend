@@ -56,6 +56,11 @@ const Login = () => {
     });
   };
 
+  // Función para navegar a la página de registro
+  const handleRegisterRedirect = () => {
+    navigate('/components/Registro');
+  };
+
   return (
     <div className="container mt-5">
       <form onSubmit={handleSubmit} className="border p-4 shadow-sm rounded">
@@ -85,6 +90,13 @@ const Login = () => {
         </div>
         <button type="submit" className="btn btn-primary">Iniciar Sesión</button>
       </form>
+
+      {/* Enlace para redirigir a la página de registro */}
+      <div className="mt-3 text-center">
+        <p>
+          Si no tienes una cuenta, <a href="#" onClick={handleRegisterRedirect}>créala aquí</a>
+        </p>
+      </div>
     </div>
   );
 };
