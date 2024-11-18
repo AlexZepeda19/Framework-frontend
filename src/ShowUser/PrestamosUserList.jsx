@@ -57,6 +57,7 @@ const PrestamosUserList = () => {
             {prestamos.map(prestamo => (
               <tr key={prestamo.idPrestamo}>
                 <td>{prestamo.idPrestamo}</td>
+                {/* Comprobación adicional de existencia de 'libro' */}
                 <td>{prestamo.libro?.titulo || 'Sin título'}</td>
                 <td>{prestamo.libro?.autor || 'Desconocido'}</td>
                 <td>{prestamo.fechaPrestamo ? new Date(prestamo.fechaPrestamo).toLocaleDateString() : 'Fecha no disponible'}</td>

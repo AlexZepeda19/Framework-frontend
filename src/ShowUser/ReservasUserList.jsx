@@ -57,6 +57,7 @@ const ReservasUserList = () => {
             {reservas.map(reserva => (
               <tr key={reserva.id_reserva}>
                 <td>{reserva.id_reserva}</td>
+                {/* Comprobación adicional de existencia de 'libro' */}
                 <td>{reserva.libro?.titulo || 'Sin título'}</td>
                 <td>{reserva.libro?.autor || 'Desconocido'}</td>
                 <td>{new Date(reserva.fecha_reserva).toLocaleDateString() || 'Fecha no disponible'}</td>

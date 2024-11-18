@@ -25,8 +25,8 @@ const MenuUser = () => {
                                 Ver más
                             </a>
                             <div className="dropdown-menu" aria-labelledby="navbarDropdown">
-                                <a className="dropdown-item" href="/ShowUser/PrestamosUser">Revisar mis préstamos</a>
-                                <a className="dropdown-item" href="/ShowUser/ReservasUser">Revisar mis reservas</a>
+                                <a className="dropdown-item" href="/ShowUser/PrestamosUserList">Revisar mis préstamos</a>
+                                <a className="dropdown-item" href="/ShowUser/ReservasUserList">Revisar mis reservas</a>
                             </div>
                         </li>
                         <li className="nav-item">

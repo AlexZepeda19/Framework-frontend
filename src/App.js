@@ -11,9 +11,13 @@ import LibrosUser from './ShowUser/LibrosUser';
 
 import Prestamos from './Show/Prestamos';
 import PrestamosUser from './FUsers/PrestamosUser';
+import PrestamosUserList from './ShowUser/PrestamosUserList'
+
 
 import Reservas from './Show/Reservas';
 import ReservasUser from './FUsers/ReservasUser';
+import ReservasUserList from './ShowUser/ReservasUserList';
+
 
 import Usuarios from './Show/Usuarios';
 
@@ -46,6 +50,9 @@ function App() {
         {/* Rutas para componentes ShowUser */}
         <Route path="/ShowUser/LibrosUser" element={<LibrosUser />} />
         <Route path="/ShowUser/CategoriasUser" element={<CategoriasUser />} />
+        <Route path="/ShowUser/PrestamosUserList" element={<PrestamosUserList />} />
+        <Route path="/ShowUser/ReservasUserList" element={<ReservasUserList />} />
+
 
 
         {/* Rutas para componentes FUsers */}

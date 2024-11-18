@@ -6,12 +6,14 @@ import Col from 'react-bootstrap/Col';
 import Row from 'react-bootstrap/Row';
 import { FaBook } from 'react-icons/fa'; 
 import { useNavigate } from 'react-router-dom';
-import { Button } from 'react-bootstrap';
+import { Button, Form } from 'react-bootstrap';
 
 const LibrosUser = () => {
   const [libros, setLibros] = useState([]);
   const [currentPage, setCurrentPage] = useState(0);
   const [librosPorPagina, setLibrosPorPagina] = useState(5);
+  const [searchQuery, setSearchQuery] = useState(''); // Para almacenar el texto de búsqueda
+  const [filteredLibros, setFilteredLibros] = useState([]); // Para almacenar los libros filtrados
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -19,6 +21,7 @@ const LibrosUser = () => {
       try {
         const response = await axios.get('http://localhost:8080/api/v1/libros');
         setLibros(response.data);
+        setFilteredLibros(response.data); // Inicialmente mostramos todos los libros
       } catch (error) {
         console.error('Error al obtener los libros:', error);
       }
@@ -27,12 +30,13 @@ const LibrosUser = () => {
     fetchLibros();
   }, []);
 
+  // Función para manejar el cambio de página
   const handlePageClick = (event) => {
     setCurrentPage(event.selected);
   };
 
   const offset = currentPage * librosPorPagina;
-  const currentLibros = libros.slice(offset, offset + librosPorPagina);
+  const currentLibros = filteredLibros.slice(offset, offset + librosPorPagina);
 
   const handlePrestar = (id) => { 
     navigate('/FUsers/PrestamosUser', { state: { libroId: id } });
@@ -42,9 +46,33 @@ const LibrosUser = () => {
     navigate('/FUsers/ReservasUser', { state: { libroId: id } }); 
   };
 
+  // Función para manejar el cambio en el campo de búsqueda
+  const handleSearchChange = (e) => {
+    const query = e.target.value;
+    setSearchQuery(query);
+
+    // Filtrar libros en tiempo real a medida que se escribe
+    const filtered = libros.filter(libro =>
+      libro.titulo.toLowerCase().includes(query.toLowerCase())
+    );
+    setFilteredLibros(filtered);
+    setCurrentPage(0); // Restablecer la página a la primera cuando se hace una búsqueda
+  };
+
   return (
     <div className="container mt-5">
       <h1 className="mb-4 text-center">Listado de Libros</h1>
+
+      {/* Campo de búsqueda */}
+      <div className="mb-4 d-flex justify-content-center">
+        <Form.Control
+          type="text"
+          placeholder="Buscar por título"
+          value={searchQuery}
+          onChange={handleSearchChange}
+          className="me-2"
+        />
+      </div>
 
       <Row xs={1} sm={2} md={3} lg={4} className="g-4">
         {currentLibros.map((libro) => (
@@ -81,7 +109,7 @@ const LibrosUser = () => {
           previousLabel={'Anterior'}
           nextLabel={'Siguiente'}
           breakLabel={'...'}
-          pageCount={Math.ceil(libros.length / librosPorPagina)}
+          pageCount={Math.ceil(filteredLibros.length / librosPorPagina)}
           marginPagesDisplayed={2}
           pageRangeDisplayed={5}
           onPageChange={handlePageClick}
