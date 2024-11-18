@@ -2,15 +2,16 @@ import React, { useEffect, useState } from 'react';
 import ReactPaginate from 'react-paginate';
 import Card from 'react-bootstrap/Card';
 import Button from 'react-bootstrap/Button';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faBook } from '@fortawesome/free-solid-svg-icons';
+import { FaBook } from 'react-icons/fa'; // Asegúrate de tener esta línea para importar el icono
 import '@fortawesome/fontawesome-free/css/all.min.css';
+import { useNavigate } from 'react-router-dom';
 
 const CategoriasUser = () => {
   const [categorias, setCategorias] = useState([]);
   const [currentPage, setCurrentPage] = useState(0);
   const [categoriasPorPagina, setCategoriasPorPagina] = useState(5); 
   const [libros, setLibros] = useState([]); // Estado para los libros filtrados por categoría
+  const navigate = useNavigate();
 
   useEffect(() => {
     // Obtener las categorías desde la API
@@ -47,6 +48,15 @@ const CategoriasUser = () => {
   const offset = currentPage * categoriasPorPagina;
   const currentCategorias = categorias.slice(offset, offset + categoriasPorPagina);
 
+  // Manejar préstamos y reservas desde esta vista
+  const handlePrestar = (id) => { 
+    navigate('/FUsers/PrestamosUser', { state: { libroId: id } });
+  };
+
+  const handleReservar = (id) => { 
+    navigate('/FUsers/ReservasUser', { state: { libroId: id } }); 
+  };
+
   return (
     <div className="container mt-5">
       <h1 className="mb-4 text-center">Listado de Categorías</h1>
@@ -58,8 +68,8 @@ const CategoriasUser = () => {
             <div className="col-md-4 mb-4" key={categoria.id_categoria}>
               <Card>
                 <Card.Body>
-                  <div className="d-flex justify-content-center mb-3">
-                    <FontAwesomeIcon icon={faBook} size="3x" />
+                  <div className="text-center mb-3">
+                    <FaBook size={80} color="#007bff" />
                   </div>
                   <Card.Title>{categoria.nombre}</Card.Title>
                   <Card.Text>{categoria.descripcion}</Card.Text>
@@ -105,14 +115,25 @@ const CategoriasUser = () => {
             <div className="col-md-4 mb-4" key={libro.id_libro}>
               <Card>
                 <Card.Body>
+                  <div className="text-center mb-3">
+                    <FaBook size={80} color="#007bff" />
+                  </div>
                   <Card.Title>{libro.titulo}</Card.Title>
                   <Card.Subtitle className="mb-2 text-muted">{libro.autor}</Card.Subtitle>
-                  <Card.Text><strong>Categoría:</strong> {libro.categoria.nombre}</Card.Text>
-                  <Card.Text><strong>ISBN:</strong> {libro.isbn}</Card.Text>
-                  <Card.Text><strong>Editorial:</strong> {libro.editorial}</Card.Text>
-                  <Card.Text><strong>Fecha de Publicación:</strong> {new Date(libro.fecha_publicacion).toLocaleDateString()}</Card.Text>
-                  <Card.Text><strong>Cantidad Total:</strong> {libro.cantidad_total}</Card.Text>
-                  <Card.Text><strong>Cantidad Disponible:</strong> {libro.cantidad_disponible}</Card.Text>
+                  <Card.Text>
+                    <strong>Categoría:</strong> {libro.categoria.nombre} <br />
+                    <strong>ISBN:</strong> {libro.isbn} <br />
+                    <strong>Editorial:</strong> {libro.editorial} <br />
+                    <strong>Fecha de Publicación:</strong> {new Date(libro.fecha_publicacion).toLocaleDateString()} <br />
+                  </Card.Text>
+                  <div className="d-flex justify-content-between">
+                    <Button variant="success" onClick={() => handlePrestar(libro.id_libro)}>
+                      Prestar
+                    </Button>
+                    <Button variant="warning" onClick={() => handleReservar(libro.id_libro)}>
+                      Reservar
+                    </Button>
+                  </div>
                 </Card.Body>
               </Card>
             </div>
