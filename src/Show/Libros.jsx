@@ -103,6 +103,7 @@ const Libros = () => {
     } catch (error) {
       console.error('Error al actualizar el libro:', error);
     }
+    window.location.reload();
   };
 
   // Función para manejar los cambios en el formulario de agregar libro
@@ -136,6 +137,7 @@ const Libros = () => {
     } catch (error) {
       console.error('Error al agregar el libro:', error);
     }
+    window.location.reload();
   };
 
   return (
