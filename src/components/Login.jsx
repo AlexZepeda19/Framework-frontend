@@ -45,7 +45,11 @@ const Login = () => {
         } 
         else if (data.roleId === 2) { 
           navigate('/pages/MenuUser');
-        } else { 
+        }
+        else if (data.roleId === 3) { 
+          navigate('/pages/MenuBibliotecario');
+        }
+        else { 
           console.warn('Rol no reconocido');
         }
       }

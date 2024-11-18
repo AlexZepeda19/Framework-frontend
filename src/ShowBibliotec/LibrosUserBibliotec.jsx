@@ -5,16 +5,14 @@ import Card from 'react-bootstrap/Card';
 import Col from 'react-bootstrap/Col';
 import Row from 'react-bootstrap/Row';
 import { FaBook } from 'react-icons/fa'; 
-import { useNavigate } from 'react-router-dom';
-import { Button, Form } from 'react-bootstrap';
+import { Form } from 'react-bootstrap';
 
-const LibrosUser = () => {
+const LibrosUserBibliotec = () => {
   const [libros, setLibros] = useState([]);
   const [currentPage, setCurrentPage] = useState(0);
   const [librosPorPagina, setLibrosPorPagina] = useState(8); // Mostrar 8 libros por página
-  const [searchQuery, setSearchQuery] = useState(''); // Para almacenar el texto de búsqueda
-  const [filteredLibros, setFilteredLibros] = useState([]); // Para almacenar los libros filtrados
-  const navigate = useNavigate();
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filteredLibros, setFilteredLibros] = useState([]);
 
   useEffect(() => {
     const fetchLibros = async () => {
@@ -37,14 +35,6 @@ const LibrosUser = () => {
 
   const offset = currentPage * librosPorPagina;
   const currentLibros = filteredLibros.slice(offset, offset + librosPorPagina);
-
-  const handlePrestar = (id) => { 
-    navigate('/FUsers/PrestamosUser', { state: { libroId: id } });
-  };
-
-  const handleReservar = (id) => { 
-    navigate('/FUsers/ReservasUser', { state: { libroId: id } }); 
-  };
 
   // Función para manejar el cambio en el campo de búsqueda
   const handleSearchChange = (e) => {
@@ -74,11 +64,12 @@ const LibrosUser = () => {
         />
       </div>
 
+      {/* Cards de libros */}
       <Row xs={1} sm={2} md={4} lg={4} className="g-4">
         {currentLibros.map((libro) => (
-          <Col key={libro.id_libro} className="d-flex">
-            <Card className="w-100">
-              <Card.Body className="d-flex flex-column">
+          <Col key={libro.id_libro}>
+            <Card className="h-100"> {/* h-100 asegura que las cards tengan el mismo tamaño */}
+              <Card.Body>
                 <div className="text-center mb-3">
                   <FaBook size={80} color="#007bff" />
                 </div>
@@ -86,18 +77,13 @@ const LibrosUser = () => {
                 <Card.Subtitle className="mb-2 text-muted">{libro.autor}</Card.Subtitle>
                 <Card.Text>
                   <strong>Categoría:</strong> {libro.categoria.nombre} <br />
+                  <strong>Descripción de Categoría:</strong> {libro.categoria.descripcion} <br />
                   <strong>ISBN:</strong> {libro.isbn} <br />
                   <strong>Editorial:</strong> {libro.editorial} <br />
                   <strong>Fecha de Publicación:</strong> {new Date(libro.fecha_publicacion).toLocaleDateString()} <br />
+                  <strong>Cantidad Total:</strong> {libro.cantidad_total} <br />
+                  <strong>Cantidad Disponible:</strong> {libro.cantidad_disponible} <br />
                 </Card.Text>
-                <div className="d-flex justify-content-between mt-auto">
-                  <Button variant="success" onClick={() => handlePrestar(libro.id_libro)}>
-                    Prestar
-                  </Button>
-                  <Button variant="warning" onClick={() => handleReservar(libro.id_libro)}>
-                    Reservar
-                  </Button>
-                </div>
               </Card.Body>
             </Card>
           </Col>
@@ -128,4 +114,4 @@ const LibrosUser = () => {
   );
 };
 
-export default LibrosUser;
+export default LibrosUserBibliotec;

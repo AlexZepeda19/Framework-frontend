@@ -2,16 +2,15 @@ import React, { useEffect, useState } from 'react';
 import ReactPaginate from 'react-paginate';
 import Card from 'react-bootstrap/Card';
 import Button from 'react-bootstrap/Button';
-import { FaBook } from 'react-icons/fa'; 
+import { FaBook } from 'react-icons/fa'; // Asegúrate de tener esta línea para importar el icono
 import '@fortawesome/fontawesome-free/css/all.min.css';
 import { useNavigate } from 'react-router-dom';
 
-const CategoriasUserBibliotec = () => {
+const CategoriasBibliotec = () => {
   const [categorias, setCategorias] = useState([]);
   const [currentPage, setCurrentPage] = useState(0);
   const [categoriasPorPagina, setCategoriasPorPagina] = useState(9); // Cambiar a 9 para mostrar 9 elementos por página (3 filas de 3)
   const [libros, setLibros] = useState([]); // Estado para los libros filtrados por categoría
-  const [totalItems, setTotalItems] = useState(0); // Para total de elementos de libros
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -29,7 +28,6 @@ const CategoriasUserBibliotec = () => {
     fetchCategorias();
   }, []); 
 
-  // Manejar el cambio de página
   const handlePageClick = (event) => {
     setCurrentPage(event.selected); 
   };
@@ -41,7 +39,6 @@ const CategoriasUserBibliotec = () => {
       const data = await response.json();
       const librosFiltrados = data.filter(libro => libro.categoria.id_categoria === id);
       setLibros(librosFiltrados); // Establecer los libros filtrados en el estado
-      setTotalItems(librosFiltrados.length); // Establecer el total de libros
     } catch (error) {
       console.error('Error al obtener los libros:', error);
     }
@@ -69,7 +66,7 @@ const CategoriasUserBibliotec = () => {
         {currentCategorias.length > 0 ? (
           currentCategorias.map((categoria) => (
             <div className="col-md-4 mb-4" key={categoria.id_categoria}> {/* Cambié a col-md-4 para 3 por fila */}
-              <Card className="card-item">
+              <Card>
                 <Card.Body>
                   <div className="text-center mb-3">
                     <FaBook size={80} color="#007bff" />
@@ -90,13 +87,13 @@ const CategoriasUserBibliotec = () => {
         )}
       </div>
 
-      {/* Paginación para las categorías */}
+      {/* Paginación para categorías */}
       <div className="d-flex justify-content-center mt-4">
         <ReactPaginate
           previousLabel={'Anterior'}
           nextLabel={'Siguiente'}
           breakLabel={'...'}
-          pageCount={Math.ceil(categorias.length / categoriasPorPagina)} // Número total de páginas para las categorías
+          pageCount={Math.ceil(categorias.length / categoriasPorPagina)} // Número total de páginas
           marginPagesDisplayed={2}
           pageRangeDisplayed={5}
           onPageChange={handlePageClick} // Manejar el cambio de página
@@ -116,7 +113,7 @@ const CategoriasUserBibliotec = () => {
         {libros.length > 0 ? (
           libros.map((libro) => (
             <div className="col-md-4 mb-4" key={libro.id_libro}> {/* Cambié a col-md-4 para 3 por fila */}
-              <Card className="card-item">
+              <Card>
                 <Card.Body>
                   <div className="text-center mb-3">
                     <FaBook size={80} color="#007bff" />
@@ -154,7 +151,7 @@ const CategoriasUserBibliotec = () => {
           previousLabel={'Anterior'}
           nextLabel={'Siguiente'}
           breakLabel={'...'}
-          pageCount={Math.ceil(totalItems / categoriasPorPagina)} // Número total de páginas para los libros filtrados
+          pageCount={Math.ceil(libros.length / categoriasPorPagina)} // Número total de páginas para los libros filtrados
           marginPagesDisplayed={2}
           pageRangeDisplayed={5}
           onPageChange={handlePageClick} // Manejar el cambio de página
@@ -172,4 +169,4 @@ const CategoriasUserBibliotec = () => {
   );
 };
 
-export default CategoriasUserBibliotec;
+export default CategoriasBibliotec;

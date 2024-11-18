@@ -1,11 +1,11 @@
 import React from 'react';
-import axios from 'axios'; 
-import { useNavigate } from 'react-router-dom'; 
+import axios from 'axios'; // Importamos axios para hacer la solicitud HTTP
+import { useNavigate } from 'react-router-dom'; // Usamos useNavigate para redirigir después del logout
 
-const MenuAdmin = () => {
+const MenuBibliotecario = () => {
+    const navigate = useNavigate(); // Usamos useNavigate para la redirección
 
-    const navigate = useNavigate();
-
+    // Función para manejar el cierre de sesión
     const handleLogout = async () => {
         const token = localStorage.getItem('token'); // Suponiendo que el token está en localStorage
 
@@ -30,7 +30,7 @@ const MenuAdmin = () => {
             console.error('Error en el cierre de sesión:', error);
             // Puedes mostrar un mensaje de error o manejarlo de otra manera
         }
-    }
+    };
 
     return (
         <div className="container mt-5">
@@ -46,19 +46,19 @@ const MenuAdmin = () => {
                             <a className="nav-link" href="/Home">Inicio</a>
                         </li>
                         <li className="nav-item">
-                            <a className="nav-link" href="/Show/Categorias">Administrar Categorías</a>
+                            <a className="nav-link" href="/ShowBibliotec/LibrosUserBibliotec">Ver Biblioteca</a>
                         </li>
                         <li className="nav-item">
-                            <a className="nav-link" href="/Show/Libros">Administrar Libros</a>
+                            <a className="nav-link" href="/ShowBibliotec/CategoriasBibliotec">Ver Categorias</a>
                         </li>
-                        <li className="nav-item">
-                            <a className="nav-link" href="/Show/Prestamos">Administrar Prestamos</a>
-                        </li>
-                        <li className="nav-item">
-                            <a className="nav-link" href="/Show/Reservas">Administrar Reservas</a>
-                        </li>
-                        <li className="nav-item">
-                            <a className="nav-link" href="/Show/Usuarios">Administrar Usuarios</a>
+                        <li className="nav-item dropdown">
+                            <a className="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                Ver más
+                            </a>
+                            <div className="dropdown-menu" aria-labelledby="navbarDropdown">
+                                <a className="dropdown-item" href="/ShowBibliotec/PrestamosUserListBibliotec">Revisar Prestamos</a>
+                                <a className="dropdown-item" href="/ShowBibliotec/ReservasUserListBibliotec">Revisar Reservas</a>
+                            </div>
                         </li>
                         <li className="nav-item">
                             <button className="btn btn-danger" onClick={handleLogout}>Cerrar Sesión</button>
@@ -76,4 +76,4 @@ const MenuAdmin = () => {
     );
 }
 
-export default MenuAdmin;
+export default MenuBibliotecario;

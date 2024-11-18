@@ -12,41 +12,25 @@ const Usuarios = () => {
   const [usuariosPorPagina, setUsuariosPorPagina] = useState(5); // Número de usuarios por página
   const [showModal, setShowModal] = useState(false);
   const [usuarioSeleccionado, setUsuarioSeleccionado] = useState(null);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [usuarioAEliminar, setUsuarioAEliminar] = useState(null);
+  const [errorMessage, setErrorMessage] = useState('');
 
+  // Obtener usuarios desde la API
   useEffect(() => {
-    // Obtener los usuarios desde la API
     const fetchUsuarios = async () => {
       try {
-        // Aquí, simularíamos la respuesta con tu JSON
-        const response = [
-          {
-            "id_usuario": 6,
-            "nombre": "manuel5",
-            "email": "manuel5@gmail.com",
-            "password": "12345678",
-            "fechaRegistro": "2023-04-05T12:34:56",
-            "rol": {
-              "id_rol": 2,
-              "nombre": "usuario"
-            },
-            "tokens": []
-          },
-          {
-            "id_usuario": 7,
-            "nombre": "manuel7",
-            "email": "manuel7@gmail.com",
-            "password": "12345678",
-            "fechaRegistro": "2023-04-05T12:34:56",
-            "rol": {
-              "id_rol": 1,
-              "nombre": "admin"
-            },
-            "tokens": []
-          }
-        ];
-        setUsuarios(response); // Establecer los usuarios directamente
+        const response = await axios.get('http://localhost:8080/api/v1/usuario');
+        
+        // Asegurarse de que la respuesta sea un array
+        if (Array.isArray(response.data)) {
+          setUsuarios(response.data); // Establecer los usuarios obtenidos desde la API
+        } else {
+          setUsuarios([]); // Si la respuesta no es un array, establecer como array vacío
+        }
       } catch (error) {
         console.error('Error al obtener los usuarios:', error);
+        setUsuarios([]); // En caso de error, establecer como array vacío
       }
     };
 
@@ -60,7 +44,7 @@ const Usuarios = () => {
 
   // Obtener el conjunto de usuarios para la página actual
   const offset = currentPage * usuariosPorPagina;
-  const currentUsuarios = Array.isArray(usuarios) ? usuarios.slice(offset, offset + usuariosPorPagina) : [];
+  const currentUsuarios = usuarios.slice(offset, offset + usuariosPorPagina);
 
   // Función para manejar el botón de actualizar
   const handleUpdate = (usuario) => {
@@ -69,18 +53,22 @@ const Usuarios = () => {
   };
 
   // Función para manejar el botón de eliminar
-  const handleDelete = async (id) => {
-    try {
-      await axios.delete(`http://localhost:8080/api/v1/usuario/${id}`);
-      setUsuarios(prevUsuarios => prevUsuarios.filter(usuario => usuario.id_usuario !== id));
-    } catch (error) {
-      console.error('Error al eliminar el usuario:', error);
+  const handleDelete = async () => {
+    if (usuarioAEliminar) {
+      try {
+        await axios.delete(`http://localhost:8080/api/v1/usuario/${usuarioAEliminar.id_usuario}`);
+        setUsuarios((prevUsuarios) => prevUsuarios.filter((usuario) => usuario.id_usuario !== usuarioAEliminar.id_usuario));
+        setShowDeleteModal(false);
+      } catch (error) {
+        console.error('Error al eliminar el usuario:', error);
+      }
     }
   };
 
   // Función para manejar el cierre del modal
   const handleCloseModal = () => {
     setShowModal(false);
+    setErrorMessage('');
   };
 
   // Función para manejar el cambio de los campos del usuario
@@ -95,14 +83,14 @@ const Usuarios = () => {
   // Función para actualizar el usuario
   const handleSave = async () => {
     if (!usuarioSeleccionado.nombre || !usuarioSeleccionado.email || !usuarioSeleccionado.rol) {
-      alert("Todos los campos son obligatorios");
+      setErrorMessage('Todos los campos son obligatorios');
       return;
     }
 
     try {
       await axios.put(`http://localhost:8080/api/v1/usuario/${usuarioSeleccionado.id_usuario}`, usuarioSeleccionado);
-      setUsuarios(prevUsuarios =>
-        prevUsuarios.map(usuario => usuario.id_usuario === usuarioSeleccionado.id_usuario ? usuarioSeleccionado : usuario)
+      setUsuarios((prevUsuarios) =>
+        prevUsuarios.map((usuario) => (usuario.id_usuario === usuarioSeleccionado.id_usuario ? usuarioSeleccionado : usuario))
       );
       setShowModal(false);
     } catch (error) {
@@ -123,7 +111,7 @@ const Usuarios = () => {
               <th>Email</th>
               <th>Fecha de Registro</th>
               <th>Rol</th>
-              <th>Acciones</th> {/* Nueva columna para botones */}
+              <th>Acciones</th>
             </tr>
           </thead>
           <tbody>
@@ -133,7 +121,7 @@ const Usuarios = () => {
                   <td>{usuario.id_usuario}</td>
                   <td>{usuario.nombre}</td>
                   <td>{usuario.email}</td>
-                  <td>{usuario.fechaRegistro ? new Date(usuario.fechaRegistro).toLocaleString() : 'Fecha no disponible'}</td>
+                  <td>{new Date(usuario.fechaRegistro).toLocaleString()}</td>
                   <td>{usuario.rol?.nombre || 'Sin rol asignado'}</td>
                   <td>
                     <button
@@ -144,7 +132,7 @@ const Usuarios = () => {
                     </button>
                     <button
                       className="btn btn-danger ml-2"
-                      onClick={() => handleDelete(usuario.id_usuario)}
+                      onClick={() => { setUsuarioAEliminar(usuario); setShowDeleteModal(true); }}
                     >
                       Eliminar
                     </button>
@@ -188,6 +176,7 @@ const Usuarios = () => {
             <Modal.Title>Actualizar Usuario</Modal.Title>
           </Modal.Header>
           <Modal.Body>
+            {errorMessage && <div className="alert alert-danger">{errorMessage}</div>}
             <Form>
               <Form.Group controlId="nombre">
                 <Form.Label>Nombre</Form.Label>
@@ -210,11 +199,15 @@ const Usuarios = () => {
               <Form.Group controlId="rol">
                 <Form.Label>Rol</Form.Label>
                 <Form.Control
-                  type="text"
+                  as="select"
                   name="rol"
-                  value={usuarioSeleccionado.rol?.nombre || ''}
+                  value={usuarioSeleccionado.rol?.id_rol || ''}
                   onChange={handleInputChange}
-                />
+                >
+                  <option value="">Seleccionar Rol</option>
+                  <option value="1">Admin</option>
+                  <option value="2">Usuario</option>
+                </Form.Control>
               </Form.Group>
             </Form>
           </Modal.Body>
@@ -224,6 +217,26 @@ const Usuarios = () => {
             </Button>
             <Button variant="primary" onClick={handleSave}>
               Guardar Cambios
+            </Button>
+          </Modal.Footer>
+        </Modal>
+      )}
+
+      {/* Modal de confirmación de eliminación */}
+      {usuarioAEliminar && (
+        <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)}>
+          <Modal.Header closeButton>
+            <Modal.Title>Confirmación de Eliminación</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            ¿Estás seguro de que quieres eliminar a este usuario?
+          </Modal.Body>
+          <Modal.Footer>
+            <Button variant="secondary" onClick={() => setShowDeleteModal(false)}>
+              Cancelar
+            </Button>
+            <Button variant="danger" onClick={handleDelete}>
+              Eliminar
             </Button>
           </Modal.Footer>
         </Modal>
