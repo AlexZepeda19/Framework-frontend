@@ -5,7 +5,6 @@ const ReservasUserListBibliotec = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
-  // Obtener el id_usuario desde el localStorage
   const idUsuario = localStorage.getItem('idUser');
 
   useEffect(() => {
@@ -18,11 +17,11 @@ const ReservasUserListBibliotec = () => {
           return response.json();
         })
         .then(data => {
-          setReservas(data);  // Establecer las reservas en el estado
-          setLoading(false);  // Dejar de mostrar el mensaje de carga
+          setReservas(data);
+          setLoading(false);
         })
         .catch(err => {
-          setError(`Error: ${err.message}`); // Manejar el error si ocurre
+          setError(`Error: ${err.message}`);
           setLoading(false);
         });
     } else {
@@ -32,19 +31,26 @@ const ReservasUserListBibliotec = () => {
   }, [idUsuario]);
 
   if (loading) {
-    return <p>Cargando reservas...</p>;
+    return <p className="text-center mt-5">Cargando reservas...</p>;
   }
 
   if (error) {
-    return <p>{error}</p>;
+    return (
+      <div className="text-center mt-5">
+        <p className="text-danger">{error}</p>
+        <button className="btn btn-primary" onClick={() => window.location.reload()}>
+          Reintentar
+        </button>
+      </div>
+    );
   }
 
   return (
     <div className="container mt-5">
-      <h2>Listado de Reservas</h2>
+      <h2 className="mb-4 text-center">Listado de Reservas</h2>
       {reservas.length > 0 ? (
-        <table className="table table-bordered">
-          <thead>
+        <table className="table table-striped table-bordered">
+          <thead className="thead-dark">
             <tr>
               <th>ID Reserva</th>
               <th>Libro</th>
@@ -57,7 +63,6 @@ const ReservasUserListBibliotec = () => {
             {reservas.map(reserva => (
               <tr key={reserva.id_reserva}>
                 <td>{reserva.id_reserva}</td>
-                {/* Comprobación adicional de existencia de 'libro' */}
                 <td>{reserva.libro?.titulo || 'Sin título'}</td>
                 <td>{reserva.libro?.autor || 'Desconocido'}</td>
                 <td>{new Date(reserva.fecha_reserva).toLocaleDateString() || 'Fecha no disponible'}</td>
@@ -69,6 +74,16 @@ const ReservasUserListBibliotec = () => {
       ) : (
         <p>No tienes reservas registradas.</p>
       )}
+
+      {/* Botón para regresar */}
+      <div className="d-flex justify-content-center mt-4">
+        <button
+          className="btn btn-primary"
+          onClick={() => window.history.back()}
+        >
+          Regresar
+        </button>
+      </div>
     </div>
   );
 };
