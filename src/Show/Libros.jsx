@@ -1,17 +1,28 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import ReactPaginate from 'react-paginate';
-import { useNavigate } from 'react-router-dom'; // Usamos useNavigate en lugar de useHistory
 import Modal from 'react-bootstrap/Modal';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 
 const Libros = () => {
   const [libros, setLibros] = useState([]);
+  const [categorias, setCategorias] = useState([]); // Estado para las categorías
   const [currentPage, setCurrentPage] = useState(0);
   const [librosPorPagina, setLibrosPorPagina] = useState(5); // Número de libros por página
   const [showModal, setShowModal] = useState(false); // Estado para controlar el modal
   const [libroSeleccionado, setLibroSeleccionado] = useState(null); // Estado para el libro seleccionado para actualizar
+  const [showAddModal, setShowAddModal] = useState(false); // Estado para el modal de agregar libro
+  const [nuevoLibro, setNuevoLibro] = useState({
+    titulo: '',
+    autor: '',
+    categoria: { id_categoria: '' }, // Asegúrate de que `id_categoria` sea una cadena vacía inicialmente
+    isbn: '',
+    editorial: '',
+    fecha_publicacion: '',
+    cantidad_total: 0,
+    cantidad_disponible: 0
+  }); // Estado para los valores del nuevo libro
 
   useEffect(() => {
     // Obtener los libros desde la API
@@ -25,6 +36,18 @@ const Libros = () => {
     };
 
     fetchLibros();
+
+    // Obtener las categorías desde la API
+    const fetchCategorias = async () => {
+      try {
+        const response = await axios.get('http://localhost:8080/api/v1/categoria');
+        setCategorias(response.data);
+      } catch (error) {
+        console.error('Error al obtener las categorías:', error);
+      }
+    };
+
+    fetchCategorias();
   }, []);
 
   // Función para manejar el cambio de página
@@ -54,7 +77,18 @@ const Libros = () => {
 
   // Función para manejar el cierre del modal
   const handleCloseModal = () => {
-    setShowModal(false); // Cerrar el modal
+    setShowModal(false); // Cerrar el modal de actualizar
+    setShowAddModal(false); // Cerrar el modal de agregar
+    setNuevoLibro({
+      titulo: '',
+      autor: '',
+      categoria: { id_categoria: '' }, // Limpiar el campo de categoría al cerrar el modal
+      isbn: '',
+      editorial: '',
+      fecha_publicacion: '',
+      cantidad_total: 0,
+      cantidad_disponible: 0
+    }); // Limpiar el formulario de agregar
   };
 
   // Función para manejar el cambio de los campos del libro
@@ -66,7 +100,25 @@ const Libros = () => {
     });
   };
 
-  // Función para actualizar el libro
+  // Función para manejar el cambio de los campos del nuevo libro
+  const handleNewBookInputChange = (e) => {
+    const { name, value } = e.target;
+
+    // Si el campo es id_categoria, guardamos el id seleccionado
+    if (name === 'categoria.id_categoria') {
+      setNuevoLibro({
+        ...nuevoLibro,
+        categoria: { id_categoria: value }
+      });
+    } else {
+      setNuevoLibro({
+        ...nuevoLibro,
+        [name]: value,
+      });
+    }
+  };
+
+  // Función para guardar el libro actualizado
   const handleSave = async () => {
     try {
       await axios.put(`http://localhost:8080/api/v1/libros/${libroSeleccionado.id_libro}`, libroSeleccionado);
@@ -74,6 +126,24 @@ const Libros = () => {
       setShowModal(false); // Cerrar el modal después de actualizar
     } catch (error) {
       console.error('Error al actualizar el libro:', error);
+    }
+  };
+
+  // Función para agregar un nuevo libro
+  const handleAddBook = async () => {
+    try {
+      // Asegurarse de que la categoría sea válida
+      if (!nuevoLibro.categoria.id_categoria) {
+        alert('Por favor, seleccione una categoría válida.');
+        return;
+      }
+
+      // Enviar el nuevo libro a la API con la estructura correcta
+      const response = await axios.post('http://localhost:8080/api/v1/libros', nuevoLibro);
+      setLibros([...libros, response.data]); // Añadir el nuevo libro a la lista
+      handleCloseModal(); // Cerrar el modal
+    } catch (error) {
+      console.error('Error al agregar el libro:', error);
     }
   };
 
@@ -94,7 +164,7 @@ const Libros = () => {
               <th>Fecha de Publicación</th>
               <th>Cantidad Total</th>
               <th>Cantidad Disponible</th>
-              <th>Acciones</th> {/* Nueva columna para botones */}
+              <th>Acciones</th>
             </tr>
           </thead>
           <tbody>
@@ -150,11 +220,18 @@ const Libros = () => {
         />
       </div>
 
-      {/* Modal de actualización */}
-      {libroSeleccionado && (
-        <Modal show={showModal} onHide={handleCloseModal}>
+      {/* Botón para agregar libro */}
+      <div className="text-center mt-4">
+        <Button variant="success" onClick={() => setShowAddModal(true)}>
+          Agregar Libro
+        </Button>
+      </div>
+
+      {/* Modal de agregar libro */}
+      {showAddModal && (
+        <Modal show={showAddModal} onHide={handleCloseModal}>
           <Modal.Header closeButton>
-            <Modal.Title>Actualizar Libro</Modal.Title>
+            <Modal.Title>Agregar Nuevo Libro</Modal.Title>
           </Modal.Header>
           <Modal.Body>
             <Form>
@@ -163,8 +240,8 @@ const Libros = () => {
                 <Form.Control
                   type="text"
                   name="titulo"
-                  value={libroSeleccionado.titulo}
-                  onChange={handleInputChange}
+                  value={nuevoLibro.titulo}
+                  onChange={handleNewBookInputChange}
                 />
               </Form.Group>
               <Form.Group controlId="autor">
@@ -172,26 +249,33 @@ const Libros = () => {
                 <Form.Control
                   type="text"
                   name="autor"
-                  value={libroSeleccionado.autor}
-                  onChange={handleInputChange}
+                  value={nuevoLibro.autor}
+                  onChange={handleNewBookInputChange}
                 />
               </Form.Group>
               <Form.Group controlId="categoria">
                 <Form.Label>Categoría</Form.Label>
                 <Form.Control
-                  type="text"
-                  name="categoria"
-                  value={libroSeleccionado.categoria.nombre}
-                  onChange={handleInputChange}
-                />
+                  as="select"
+                  name="categoria.id_categoria"
+                  value={nuevoLibro.categoria.id_categoria}
+                  onChange={handleNewBookInputChange}
+                >
+                  <option value="">Seleccione una categoría</option>
+                  {categorias.map(categoria => (
+                    <option key={categoria.id_categoria} value={categoria.id_categoria}>
+                      {categoria.nombre}
+                    </option>
+                  ))}
+                </Form.Control>
               </Form.Group>
               <Form.Group controlId="isbn">
                 <Form.Label>ISBN</Form.Label>
                 <Form.Control
                   type="text"
                   name="isbn"
-                  value={libroSeleccionado.isbn}
-                  onChange={handleInputChange}
+                  value={nuevoLibro.isbn}
+                  onChange={handleNewBookInputChange}
                 />
               </Form.Group>
               <Form.Group controlId="editorial">
@@ -199,8 +283,8 @@ const Libros = () => {
                 <Form.Control
                   type="text"
                   name="editorial"
-                  value={libroSeleccionado.editorial}
-                  onChange={handleInputChange}
+                  value={nuevoLibro.editorial}
+                  onChange={handleNewBookInputChange}
                 />
               </Form.Group>
               <Form.Group controlId="fecha_publicacion">
@@ -208,8 +292,8 @@ const Libros = () => {
                 <Form.Control
                   type="date"
                   name="fecha_publicacion"
-                  value={libroSeleccionado.fecha_publicacion}
-                  onChange={handleInputChange}
+                  value={nuevoLibro.fecha_publicacion}
+                  onChange={handleNewBookInputChange}
                 />
               </Form.Group>
               <Form.Group controlId="cantidad_total">
@@ -217,8 +301,8 @@ const Libros = () => {
                 <Form.Control
                   type="number"
                   name="cantidad_total"
-                  value={libroSeleccionado.cantidad_total}
-                  onChange={handleInputChange}
+                  value={nuevoLibro.cantidad_total}
+                  onChange={handleNewBookInputChange}
                 />
               </Form.Group>
               <Form.Group controlId="cantidad_disponible">
@@ -226,8 +310,8 @@ const Libros = () => {
                 <Form.Control
                   type="number"
                   name="cantidad_disponible"
-                  value={libroSeleccionado.cantidad_disponible}
-                  onChange={handleInputChange}
+                  value={nuevoLibro.cantidad_disponible}
+                  onChange={handleNewBookInputChange}
                 />
               </Form.Group>
             </Form>
@@ -236,8 +320,8 @@ const Libros = () => {
             <Button variant="secondary" onClick={handleCloseModal}>
               Cerrar
             </Button>
-            <Button variant="primary" onClick={handleSave}>
-              Guardar Cambios
+            <Button variant="primary" onClick={handleAddBook}>
+              Agregar Libro
             </Button>
           </Modal.Footer>
         </Modal>
