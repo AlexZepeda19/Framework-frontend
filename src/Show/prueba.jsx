@@ -10,13 +10,13 @@ const Libros = () => {
   const [categorias, setCategorias] = useState([]); // Estado para las categorías
   const [currentPage, setCurrentPage] = useState(0);
   const [librosPorPagina, setLibrosPorPagina] = useState(5); // Número de libros por página
-  const [showModal, setShowModal] = useState(false); // Estado para controlar el modal de actualización
+  const [showModal, setShowModal] = useState(false); // Estado para controlar el modal
   const [libroSeleccionado, setLibroSeleccionado] = useState(null); // Estado para el libro seleccionado para actualizar
   const [showAddModal, setShowAddModal] = useState(false); // Estado para el modal de agregar libro
   const [nuevoLibro, setNuevoLibro] = useState({
     titulo: '',
     autor: '',
-    categoria: '', // Solo el id_categoria
+    categoria: { id_categoria: '' }, // Asegúrate de que id_categoria sea una cadena vacía inicialmente
     isbn: '',
     editorial: '',
     fecha_publicacion: '',
@@ -24,21 +24,30 @@ const Libros = () => {
     cantidad_disponible: 0
   }); // Estado para los valores del nuevo libro
 
-  // UseEffect para cargar los libros y categorías al iniciar
   useEffect(() => {
-    const fetchData = async () => {
+    // Obtener los libros desde la API
+    const fetchLibros = async () => {
       try {
-        const [librosResponse, categoriasResponse] = await Promise.all([
-          axios.get('http://localhost:8080/api/v1/libros'),
-          axios.get('http://localhost:8080/api/v1/categoria'),
-        ]);
-        setLibros(librosResponse.data);
-        setCategorias(categoriasResponse.data);
+        const response = await axios.get('http://localhost:8080/api/v1/libros');
+        setLibros(response.data);
       } catch (error) {
-        console.error('Error al obtener datos:', error);
+        console.error('Error al obtener los libros:', error);
       }
     };
-    fetchData();
+
+    fetchLibros();
+
+    // Obtener las categorías desde la API
+    const fetchCategorias = async () => {
+      try {
+        const response = await axios.get('http://localhost:8080/api/v1/categoria');
+        setCategorias(response.data);
+      } catch (error) {
+        console.error('Error al obtener las categorías:', error);
+      }
+    };
+
+    fetchCategorias();
   }, []);
 
   // Función para manejar el cambio de página
@@ -52,30 +61,28 @@ const Libros = () => {
 
   // Función para manejar el botón de actualizar
   const handleUpdate = (libro) => {
-    setLibroSeleccionado(libro);
-    setShowModal(true);
+    setLibroSeleccionado(libro); // Establecer el libro a editar
+    setShowModal(true); // Mostrar el modal
   };
 
   // Función para manejar el botón de eliminar
   const handleDelete = async (id) => {
-    if (window.confirm('¿Estás seguro de que deseas eliminar este libro?')) {
-      try {
-        await axios.delete(`http://localhost:8080/api/v1/libros/${id}`);
-        setLibros(libros.filter(libro => libro.id_libro !== id));
-      } catch (error) {
-        console.error('Error al eliminar el libro:', error);
-      }
+    try {
+      await axios.delete(http://localhost:8080/api/v1/libros/${id});
+      setLibros(libros.filter(libro => libro.id_libro !== id));
+    } catch (error) {
+      console.error('Error al eliminar el libro:', error);
     }
   };
 
-  // Función para cerrar los modales
+  // Función para manejar el cierre del modal
   const handleCloseModal = () => {
-    setShowModal(false); // Cerrar el modal de actualización
+    setShowModal(false); // Cerrar el modal de actualizar
     setShowAddModal(false); // Cerrar el modal de agregar
     setNuevoLibro({
       titulo: '',
       autor: '',
-      categoria: '',
+      categoria: { id_categoria: '' }, // Limpiar el campo de categoría al cerrar el modal
       isbn: '',
       editorial: '',
       fecha_publicacion: '',
@@ -84,53 +91,55 @@ const Libros = () => {
     }); // Limpiar el formulario de agregar
   };
 
-  // Función para manejar los cambios en los campos del libro (para actualización)
-  const handleUpdateInputChange = (e) => {
+  // Función para manejar el cambio de los campos del libro
+  const handleInputChange = (e) => {
     const { name, value } = e.target;
-
     setLibroSeleccionado({
       ...libroSeleccionado,
-      [name]: name === 'categoria' ? { id_categoria: value } : value, // Si el campo es "categoria", actualizar como un objeto
+      [name]: value,
     });
+  };
+
+  // Función para manejar el cambio de los campos del nuevo libro
+  const handleNewBookInputChange = (e) => {
+    const { name, value } = e.target;
+
+    // Si el campo es id_categoria, guardamos el id seleccionado
+    if (name === 'categoria.id_categoria') {
+      setNuevoLibro({
+        ...nuevoLibro,
+        categoria: { id_categoria: value }
+      });
+    } else {
+      setNuevoLibro({
+        ...nuevoLibro,
+        [name]: value,
+      });
+    }
   };
 
   // Función para guardar el libro actualizado
   const handleSave = async () => {
     try {
-      const response = await axios.put(`http://localhost:8080/api/v1/libros/${libroSeleccionado.id_libro}`, libroSeleccionado);
-      setLibros(libros.map(libro => libro.id_libro === libroSeleccionado.id_libro ? response.data : libro));
-      setShowModal(false);
+      await axios.put(http://localhost:8080/api/v1/libros/${libroSeleccionado.id_libro}, libroSeleccionado);
+      setLibros(libros.map(libro => libro.id_libro === libroSeleccionado.id_libro ? libroSeleccionado : libro));
+      setShowModal(false); // Cerrar el modal después de actualizar
     } catch (error) {
       console.error('Error al actualizar el libro:', error);
     }
-  };
-
-  // Función para manejar los cambios en el formulario de agregar libro
-  const handleNewBookInputChange = (e) => {
-    const { name, value } = e.target;
-    setNuevoLibro((prevLibro) => ({
-      ...prevLibro,
-      [name]: value,
-    }));
   };
 
   // Función para agregar un nuevo libro
   const handleAddBook = async () => {
     try {
       // Asegurarse de que la categoría sea válida
-      if (!nuevoLibro.categoria) {
+      if (!nuevoLibro.categoria.id_categoria) {
         alert('Por favor, seleccione una categoría válida.');
         return;
       }
 
-      // Crear el objeto para enviar al servidor
-      const libroParaEnviar = {
-        ...nuevoLibro,
-        categoria: { id_categoria: nuevoLibro.categoria }, // Enviar el id de la categoría
-      };
-
-      // Enviar el nuevo libro a la API
-      const response = await axios.post('http://localhost:8080/api/v1/libros', libroParaEnviar);
+      // Enviar el nuevo libro a la API con la estructura correcta
+      const response = await axios.post('http://localhost:8080/api/v1/libros', nuevoLibro);
       setLibros([...libros, response.data]); // Añadir el nuevo libro a la lista
       handleCloseModal(); // Cerrar el modal
     } catch (error) {
@@ -248,19 +257,18 @@ const Libros = () => {
                 <Form.Label>Categoría</Form.Label>
                 <Form.Control
                   as="select"
-                  name="categoria"
-                  value={nuevoLibro.categoria}
+                  name="categoria.id_categoria"
+                  value={nuevoLibro.categoria.id_categoria}
                   onChange={handleNewBookInputChange}
                 >
-                  <option value="">Selecciona una categoría</option>
-                  {categorias.map((categoria) => (
+                  <option value="">Seleccione una categoría</option>
+                  {categorias.map(categoria => (
                     <option key={categoria.id_categoria} value={categoria.id_categoria}>
                       {categoria.nombre}
                     </option>
                   ))}
                 </Form.Control>
               </Form.Group>
-              {/* Otros campos del libro */}
               <Form.Group controlId="isbn">
                 <Form.Label>ISBN</Form.Label>
                 <Form.Control
@@ -313,108 +321,7 @@ const Libros = () => {
               Cerrar
             </Button>
             <Button variant="primary" onClick={handleAddBook}>
-              Guardar
-            </Button>
-          </Modal.Footer>
-        </Modal>
-      )}
-
-      {/* Modal de actualización */}
-      {showModal && libroSeleccionado && (
-        <Modal show={showModal} onHide={handleCloseModal}>
-          <Modal.Header closeButton>
-            <Modal.Title>Actualizar Libro</Modal.Title>
-          </Modal.Header>
-          <Modal.Body>
-            <Form>
-              <Form.Group controlId="titulo">
-                <Form.Label>Título</Form.Label>
-                <Form.Control
-                  type="text"
-                  name="titulo"
-                  value={libroSeleccionado.titulo}
-                  onChange={handleUpdateInputChange}
-                />
-              </Form.Group>
-              <Form.Group controlId="autor">
-                <Form.Label>Autor</Form.Label>
-                <Form.Control
-                  type="text"
-                  name="autor"
-                  value={libroSeleccionado.autor}
-                  onChange={handleUpdateInputChange}
-                />
-              </Form.Group>
-              <Form.Group controlId="categoria">
-                <Form.Label>Categoría</Form.Label>
-                <Form.Control
-                  as="select"
-                  name="categoria"
-                  value={libroSeleccionado.categoria.id_categoria} // Asumimos que categoria es un objeto con id_categoria
-                  onChange={handleUpdateInputChange}
-                >
-                  <option value="">Selecciona una categoría</option>
-                  {categorias.map((categoria) => (
-                    <option key={categoria.id_categoria} value={categoria.id_categoria}>
-                      {categoria.nombre}
-                    </option>
-                  ))}
-                </Form.Control>
-              </Form.Group>
-              {/* Otros campos del libro */}
-              <Form.Group controlId="isbn">
-                <Form.Label>ISBN</Form.Label>
-                <Form.Control
-                  type="text"
-                  name="isbn"
-                  value={libroSeleccionado.isbn}
-                  onChange={handleUpdateInputChange}
-                />
-              </Form.Group>
-              <Form.Group controlId="editorial">
-                <Form.Label>Editorial</Form.Label>
-                <Form.Control
-                  type="text"
-                  name="editorial"
-                  value={libroSeleccionado.editorial}
-                  onChange={handleUpdateInputChange}
-                />
-              </Form.Group>
-              <Form.Group controlId="fecha_publicacion">
-                <Form.Label>Fecha de Publicación</Form.Label>
-                <Form.Control
-                  type="date"
-                  name="fecha_publicacion"
-                  value={libroSeleccionado.fecha_publicacion}
-                  onChange={handleUpdateInputChange}
-                />
-              </Form.Group>
-              <Form.Group controlId="cantidad_total">
-                <Form.Label>Cantidad Total</Form.Label>
-                <Form.Control
-                  type="number"
-                  name="cantidad_total"
-                  value={libroSeleccionado.cantidad_total}
-                  onChange={handleUpdateInputChange}
-                />
-              </Form.Group>
-              <Form.Group controlId="cantidad_disponible">
-                <Form.Label>Cantidad Disponible</Form.Label>
-                <Form.Control
-                  type="number"
-                  name="cantidad_disponible"
-                  value={libroSeleccionado.cantidad_disponible}
-                  onChange={handleUpdateInputChange}
-                />
-              </Form.Group>
-            </Form>
-          </Modal.Body>
-          <Modal.Footer>
-            <Button variant="secondary" onClick={handleCloseModal}>
-              Cerrar
-            </Button>
-            <Button variant="primary" onClick={handleSave}>
-              Guardar Cambios
+              Agregar Libro
             </Button>
           </Modal.Footer>
         </Modal>
@@ -423,4 +330,4 @@ const Libros = () => {
   );
 };
 
-export default Libros;
+export default Libros;
