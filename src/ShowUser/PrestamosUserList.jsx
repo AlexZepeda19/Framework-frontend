@@ -5,7 +5,6 @@ const PrestamosUserList = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
-  // Obtener el id_usuario desde el localStorage
   const idUsuario = localStorage.getItem('idUser');
 
   useEffect(() => {
@@ -18,11 +17,11 @@ const PrestamosUserList = () => {
           return response.json();
         })
         .then(data => {
-          setPrestamos(data);  // Establecer los préstamos en el estado
-          setLoading(false);  // Dejar de mostrar el mensaje de carga
+          setPrestamos(data);
+          setLoading(false);
         })
         .catch(err => {
-          setError(`Error: ${err.message}`); // Manejar el error si ocurre
+          setError(`Error: ${err.message}`);
           setLoading(false);
         });
     } else {
@@ -32,19 +31,26 @@ const PrestamosUserList = () => {
   }, [idUsuario]);
 
   if (loading) {
-    return <p>Cargando préstamos...</p>;
+    return <p className="text-center mt-5">Cargando préstamos...</p>;
   }
 
   if (error) {
-    return <p>{error}</p>;
+    return (
+      <div className="text-center mt-5">
+        <p className="text-danger">{error}</p>
+        <button className="btn btn-primary" onClick={() => window.location.reload()}>
+          Reintentar
+        </button>
+      </div>
+    );
   }
 
   return (
     <div className="container mt-5">
-      <h2>Listado de Préstamos</h2>
+      <h2 className="mb-4 text-center">Listado de Préstamos</h2>
       {prestamos.length > 0 ? (
-        <table className="table table-bordered">
-          <thead>
+        <table className="table table-striped table-bordered">
+          <thead className="thead-dark">
             <tr>
               <th>ID Préstamo</th>
               <th>Libro</th>
@@ -57,7 +63,6 @@ const PrestamosUserList = () => {
             {prestamos.map(prestamo => (
               <tr key={prestamo.idPrestamo}>
                 <td>{prestamo.idPrestamo}</td>
-                {/* Comprobación adicional de existencia de 'libro' */}
                 <td>{prestamo.libro?.titulo || 'Sin título'}</td>
                 <td>{prestamo.libro?.autor || 'Desconocido'}</td>
                 <td>{prestamo.fechaPrestamo ? new Date(prestamo.fechaPrestamo).toLocaleDateString() : 'Fecha no disponible'}</td>
@@ -69,6 +74,16 @@ const PrestamosUserList = () => {
       ) : (
         <p>No tienes préstamos registrados.</p>
       )}
+
+      {/* Botón para regresar */}
+      <div className="d-flex justify-content-center mt-4">
+        <button
+          className="btn btn-primary"
+          onClick={() => window.history.back()}
+        >
+          Regresar
+        </button>
+      </div>
     </div>
   );
 };
