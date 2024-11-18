@@ -209,6 +209,16 @@ const Categorias = () => {
           </div>
         </div>
       )}
+
+      {/* Botón para regresar */}
+      <div className="d-flex justify-content-center mt-4">
+        <button
+          className="btn btn-primary"
+          onClick={() => window.history.back()}
+        >
+          Regresar
+        </button>
+      </div>
     </div>
   );
 };
