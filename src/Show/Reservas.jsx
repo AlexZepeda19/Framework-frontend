@@ -1,107 +1,98 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import ReactPaginate from 'react-paginate';
+import { Modal, Button, Form } from 'react-bootstrap';
 
-const ReservasList = () => {
-  const [reservas, setReservas] = useState([]);
+const Prestamos = () => {
+  const [prestamos, setPrestamos] = useState([]);
   const [currentPage, setCurrentPage] = useState(0);
-  const [reservasPorPagina, setReservasPorPagina] = useState(5); // Número de reservas por página
-  const [showModal, setShowModal] = useState(false); // Estado para mostrar el modal
-  const [reservaSeleccionada, setReservaSeleccionada] = useState(null); // Para almacenar la reserva seleccionada para actualizar
+  const [prestamosPorPagina, setPrestamosPorPagina] = useState(5);
+  const [showModal, setShowModal] = useState(false);
+  const [prestamoEditando, setPrestamoEditando] = useState(null);
 
   useEffect(() => {
-    // Obtener las reservas desde la API
-    const fetchReservas = async () => {
+    const fetchPrestamos = async () => {
       try {
-        const response = await axios.get('http://localhost:8080/api/reservas');
-        setReservas(response.data);
+        const response = await axios.get('http://localhost:8080/api/v1/prestamos');
+        setPrestamos(response.data);
       } catch (error) {
-        console.error("Error al obtener las reservas:", error);
+        console.error('Error al obtener los préstamos:', error);
       }
     };
-    fetchReservas();
+
+    fetchPrestamos();
   }, []);
 
-  // Función para manejar el cambio de página
   const handlePageClick = (event) => {
     setCurrentPage(event.selected);
   };
 
-  // Obtener las reservas para la página actual
-  const offset = currentPage * reservasPorPagina;
-  const currentReservas = reservas.slice(offset, offset + reservasPorPagina);
+  const offset = currentPage * prestamosPorPagina;
+  const currentPrestamos = prestamos.slice(offset, offset + prestamosPorPagina);
 
-  // Función para manejar la eliminación de una reserva
+  const handleUpdate = (prestamo) => {
+    setPrestamoEditando(prestamo);
+    setShowModal(true);
+  };
+
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`http://localhost:8080/api/reservas/${id}`);
-      setReservas(reservas.filter((reserva) => reserva.id_reserva !== id));
-      alert("Reserva eliminada correctamente");
+      await axios.delete(`http://localhost:8080/api/v1/prestamos/${id}`);
+      setPrestamos(prestamos.filter(prestamo => prestamo.idPrestamo !== id));
     } catch (error) {
-      console.error("Error al eliminar la reserva:", error);
+      console.error('Error al eliminar el préstamo:', error);
     }
   };
 
-  // Función para manejar la actualización de una reserva
-  const handleUpdate = async () => {
+  const handleSaveUpdate = async () => {
     try {
-      await axios.put(`http://localhost:8080/api/reservas/${reservaSeleccionada.id_reserva}`, reservaSeleccionada);
-      setReservas(reservas.map((reserva) =>
-        reserva.id_reserva === reservaSeleccionada.id_reserva ? reservaSeleccionada : reserva
-      ));
+      await axios.put(`http://localhost:8080/api/v1/prestamos/${prestamoEditando.idPrestamo}`, prestamoEditando);
+      setPrestamos(prestamos.map(p => (p.idPrestamo === prestamoEditando.idPrestamo ? prestamoEditando : p)));
       setShowModal(false);
-      alert("Reserva actualizada correctamente");
     } catch (error) {
-      console.error("Error al actualizar la reserva:", error);
+      console.error('Error al actualizar el préstamo:', error);
     }
   };
 
-  // Función para manejar el cambio en el formulario del modal
-  const handleChange = (event) => {
-    const { name, value } = event.target;
-    setReservaSeleccionada((prevReserva) => ({
-      ...prevReserva,
-      [name]: value
-    }));
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setPrestamoEditando({ ...prestamoEditando, [name]: value });
   };
 
   return (
     <div className="container mt-5">
-      <h1 className="mb-4 text-center">Lista de Reservas</h1>
+      <h1 className="mb-4 text-center">Listado de Préstamos</h1>
 
       <div className="table-responsive">
         <table className="table table-striped table-bordered">
           <thead className="thead-dark">
             <tr>
-              <th>ID Reserva</th>
+              <th>ID Préstamo</th>
               <th>Usuario</th>
               <th>Libro</th>
-              <th>Fecha de Reserva</th>
-              <th>Estado</th>
+              <th>Fecha de Préstamo</th>
+              <th>Fecha de Devolución</th>
               <th>Acciones</th>
             </tr>
           </thead>
           <tbody>
-            {currentReservas.map((reserva) => (
-              <tr key={reserva.id_reserva}>
-                <td>{reserva.id_reserva}</td>
-                <td>{reserva.usuario.nombre}</td>
-                <td>{reserva.libro.titulo}</td>
-                <td>{new Date(reserva.fecha_reserva).toLocaleString()}</td>
-                <td>{reserva.estado.nombreEstado}</td>
+            {currentPrestamos.map((prestamo) => (
+              <tr key={prestamo.idPrestamo}>
+                <td>{prestamo.idPrestamo}</td>
+                <td>{prestamo.usuario.nombre} ({prestamo.usuario.email})</td>
+                <td>{prestamo.libro.titulo} ({prestamo.libro.autor})</td>
+                <td>{prestamo.fechaPrestamo}</td>
+                <td>{prestamo.fechaDevolucion}</td>
                 <td>
-                  <button 
-                    className="btn btn-warning btn-sm"
-                    onClick={() => {
-                      setReservaSeleccionada(reserva);
-                      setShowModal(true);
-                    }}
+                  <button
+                    className="btn btn-warning"
+                    onClick={() => handleUpdate(prestamo)}
                   >
                     Actualizar
                   </button>
-                  <button 
-                    className="btn btn-danger btn-sm ml-2"
-                    onClick={() => handleDelete(reserva.id_reserva)}
+                  <button
+                    className="btn btn-danger ml-2"
+                    onClick={() => handleDelete(prestamo.idPrestamo)}
                   >
                     Eliminar
                   </button>
@@ -112,49 +103,12 @@ const ReservasList = () => {
         </table>
       </div>
 
-      {/* Modal de actualización */}
-      {showModal && reservaSeleccionada && (
-        <div className="modal fade show" style={{ display: 'block' }} tabIndex="-1" role="dialog">
-          <div className="modal-dialog" role="document">
-            <div className="modal-content">
-              <div className="modal-header">
-                <h5 className="modal-title">Actualizar Reserva</h5>
-                <button type="button" className="close" onClick={() => setShowModal(false)}>&times;</button>
-              </div>
-              <div className="modal-body">
-                <form>
-                  <div className="form-group">
-                    <label>Estado</label>
-                    <input 
-                      type="text"
-                      className="form-control"
-                      name="estado"
-                      value={reservaSeleccionada.estado.nombreEstado}
-                      onChange={handleChange}
-                    />
-                  </div>
-                </form>
-              </div>
-              <div className="modal-footer">
-                <button type="button" className="btn btn-secondary" onClick={() => setShowModal(false)}>
-                  Cerrar
-                </button>
-                <button type="button" className="btn btn-primary" onClick={handleUpdate}>
-                  Actualizar
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Paginación */}
       <div className="d-flex justify-content-center">
         <ReactPaginate
           previousLabel={'Anterior'}
           nextLabel={'Siguiente'}
           breakLabel={'...'}
-          pageCount={Math.ceil(reservas.length / reservasPorPagina)}
+          pageCount={Math.ceil(prestamos.length / prestamosPorPagina)}
           marginPagesDisplayed={2}
           pageRangeDisplayed={5}
           onPageChange={handlePageClick}
@@ -168,8 +122,51 @@ const ReservasList = () => {
           nextLinkClassName={'page-link'}
         />
       </div>
+
+      <Modal show={showModal} onHide={() => setShowModal(false)}>
+        <Modal.Header closeButton>
+          <Modal.Title>Actualizar Préstamo</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <Form>
+            <Form.Group controlId="formFechaDevolucion">
+              <Form.Label>Fecha de Devolución</Form.Label>
+              <Form.Control
+                type="date"
+                name="fechaDevolucion"
+                value={prestamoEditando ? prestamoEditando.fechaDevolucion : ''}
+                onChange={handleInputChange}
+              />
+            </Form.Group>
+            <Form.Group controlId="formFechaPrestamo">
+              <Form.Label>Fecha de Préstamo</Form.Label>
+              <Form.Control
+                type="date"
+                name="fechaPrestamo"
+                value={prestamoEditando ? prestamoEditando.fechaPrestamo : ''}
+                onChange={handleInputChange}
+              />
+            </Form.Group>
+          </Form>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={() => setShowModal(false)}>
+            Cerrar
+          </Button>
+          <Button variant="primary" onClick={handleSaveUpdate}>
+            Guardar cambios
+          </Button>
+        </Modal.Footer>
+      </Modal>
+
+      {/* Botón de regresar */}
+      <div className="mt-4 text-center">
+        <button className="btn btn-secondary" onClick={() => window.history.back()}>
+          Regresar
+        </button>
+      </div>
     </div>
   );
 };
 
-export default ReservasList;
+export default Prestamos;
